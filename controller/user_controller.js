@@ -1,4 +1,5 @@
 const User = require("../model/user.js")
+const Topic = require("../model/topic.js")
 const bcrypt = require("../pkg/auth/authorization.js")
 const auth = require("../pkg/auth/authentication.js")
 const helper = require("../pkg/helper/helper.js")
@@ -20,6 +21,22 @@ const register = async (req,res)=>{
     })
     const newUser = new User(req.body)
     newUser.password = bcrypt.hashPassword(newUser.password)
+    await newUser.learnTopicSkill.forEach(async (topicId)=>{
+        const topic = await Topic.find(topicId)
+        if(!topic){
+            return res.status(400).json({
+                message: "Something went wrong"
+            })
+        }
+    })
+    await newUser.userTopicSkill.forEach(async (topicId)=>{
+        const topic = await Topic.find(topicId)
+        if(!topic){
+            return res.status(400).json({
+                message: "Something went wrong"
+            })
+        }
+    })
     newUser.save().catch((err)=>{
         return res.status(400).json({
             message: "Something went wrong"
