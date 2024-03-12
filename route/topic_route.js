@@ -1,0 +1,1 @@
+const topicController = require("../controller/topic_controller.js")
