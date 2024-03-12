@@ -58,7 +58,7 @@ const login = async (req,res)=>{
 }
 
 const getUserByTopic= async (req,res)=>{
-    const topics = req.query.topic 
+    const topics = req.query.topics
     const topicList = topics.split(',')
     const user = await User.find({
         userTopicSkill: {$in: topicList}
@@ -149,4 +149,14 @@ const getUserByEmail = async (req,res) =>{
     })
 }
 
-module.exports = {register,login,getUserByEmail,getUserByTopic,changePassword,deleteUser,updateUser}
+const getAllUser = async (req,res)=>{
+    const userList = await User.find().catch((err)=>{
+        return res.status(400).json({
+            message: "Something went wrong"
+        })
+    })
+    return res.json({
+        data: userList
+    })
+}
+module.exports = {register,login,getUserByEmail,getUserByTopic,changePassword,deleteUser,updateUser,getAllUser}

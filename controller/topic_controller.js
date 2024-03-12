@@ -91,4 +91,22 @@ const updateTopic = async (req,res) =>{
     })
 }
 
-module.exports = {updateTopic,deleteTopic,getAllTopic,getTopicById}
+const getTopicLimit = async (req,res)=>{
+    const limit = req.params.limit
+    const topics = await Topic.find().limit(limit)
+    return res.json({
+        data: topics
+    })
+}
+const getTopicPagination = async (req,res)=>{
+    const limit = req.query.limit
+    const page = req.query.page
+    const topics = await Topic.aggregate([
+        {$skip: (page-1)*limit},
+        {$limit: limit}
+    ])
+    return res.json({
+        data: topics
+    })
+}
+module.exports = {updateTopic,deleteTopic,getAllTopic,getTopicById,addNewTopic, getTopicLimit,getTopicPagination}
