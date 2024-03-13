@@ -1,10 +1,11 @@
 const User = require("../model/user.js")
 const Topic = require("../model/topic.js")
+const tokenController = require("../controller/token_controller.js")
+const moment = require("moment")
 const bcrypt = require("../pkg/auth/authorization.js")
 const auth = require("../pkg/auth/authentication.js")
 const helper = require("../pkg/helper/helper.js")
 const register = async (req,res)=>{
-    
     const isValidEmail = await helper.isValidEmail(req.body.email)
     const isValidPhoneNumber = await helper.isValidPhoneNumber(req.body.phoneNumber)
     if(!isValidEmail) return res.status(400).json({
@@ -13,47 +14,55 @@ const register = async (req,res)=>{
     if(!isValidPhoneNumber) return res.status(400).json({
         message: "Invalid phone number"
     })
-    const existUser = await User.find({
+    const existUser = await User.findOne({
         email: req.body.email
     })
+    console.log(existUser)
     if(existUser) return res.status(400).json({
         message: "Existed email"
     })
     const newUser = new User(req.body)
-    newUser.password = bcrypt.hashPassword(newUser.password)
-    await newUser.learnTopicSkill.forEach(async (topicId)=>{
-        const topic = await Topic.find(topicId)
-        if(!topic){
-            return res.status(400).json({
-                message: "Something went wrong"
-            })
-        }
-    })
-    await newUser.userTopicSkill.forEach(async (topicId)=>{
-        const topic = await Topic.find(topicId)
-        if(!topic){
-            return res.status(400).json({
-                message: "Something went wrong"
-            })
-        }
-    })
-    newUser.save().catch((err)=>{
+    newUser.password =await  bcrypt.hashPassword(newUser.password)
+    const dateString = req.body.birthDay
+    const dateSplit = dateString.split("/")
+    var day = parseInt(dateSplit[0], 10);
+    var month = parseInt(dateSplit[1], 10) - 1; // Month is zero-based
+    var year = parseInt(dateSplit[2], 10);
+    newUser.birthDay = new Date(Date.UTC(year, month, day))
+    // await newUser.learnTopicSkill.forEach(async (topicId)=>{
+    //     const topic = await Topic.find(topicId)
+    //     if(!topic){
+    //         return res.status(400).json({
+    //             message: "Something went wrong"
+    //         })
+    //     }
+    // })
+    // await newUser.userTopicSkill.forEach(async (topicId)=>{
+    //     const topic = await Topic.find(topicId)
+    //     if(!topic){
+    //         return res.status(400).json({
+    //             message: "Something went wrong"
+    //         })
+    //     }
+    // })
+    await newUser.save().catch((err)=>{
         return res.status(400).json({
             message: "Something went wrong"
         })
     })
-    const accessToken = await auth.generateToken(newUser._id, "1d")
-    const refreshToken = await auth.generateToken(newUser._id, "30d")
+    const accessToken = await auth.generateToken(newUser, "1d")
+    const refreshToken = await auth.generateToken(newUser, "30d")
+    tokenController.addNewToken(accessToken, newUser._id)
     return res.json({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-        data: newUser.populate([{path: "userTopicSkill"},{path: "learnTopicSkill"}])
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        data: newUser
     })
 
 }
 
 const login = async (req,res)=>{
-    const existUser = await User.find({
+    const existUser = await User.findOne({
         email: req.body.email
     })
     if(!existUser) return res.status(404).json({
@@ -63,14 +72,16 @@ const login = async (req,res)=>{
     if(!isValidPassword) return res.status(401).json({
         message: "Unauthorized"
     })
-
-    const accessToken = auth.generateToken(existUser._id,"1d")
-    const refreshToken = auth.generateToken(existUser._id, "30d")
-
+    const user = await User.findOne({
+        email: req.body.email
+    }).select('-password')
+    const accessToken = await auth.generateToken(existUser,"1d")
+    const refreshToken = await auth.generateToken(existUser, "30d")
+    tokenController.addNewToken(accessToken, user._id)
     return res.json({
         access_token: accessToken,
         refresh_token: refreshToken,
-        data: existUser.populate([{path: "userTopicSkill"},{path: "learnTopicSkill"}])
+        data: user
     })
 }
 
@@ -113,6 +124,17 @@ const updateUser = async (req,res)=>{
     if(!isValidId) return res.status(400).json({
         message: "Invalid id"
     })
+    if(req.body.password != null) return res.status(400).json({
+        message: "Use changePassword route to change password"
+    })
+    if(req.body.birthDay != null){
+        const dateString = req.body.birthDay
+        const dateSplit = dateString.split("/")
+        var day = parseInt(dateSplit[0], 10);
+        var month = parseInt(dateSplit[1], 10) - 1; // Month is zero-based
+        var year = parseInt(dateSplit[2], 10);
+        req.body.birthDay = new Date(Date.UTC(year,month,day))
+    }
     await User.findByIdAndUpdate(id,req.body).catch((err)=>{
         return res.status(400).json({
             message: "Something went wrong"
@@ -129,7 +151,7 @@ const changePassword = async (req,res) =>{
     if(!isValidEmail) return res.status(400).json({
         message: "Invalid email"
     })
-    const existUser = await User.find({
+    const existUser = await User.findOne({
         email: req.body.email
     })
     if(!existUser) return res.status(404).json({
@@ -176,4 +198,21 @@ const getAllUser = async (req,res)=>{
         data: userList
     })
 }
-module.exports = {register,login,getUserByEmail,getUserByTopic,changePassword,deleteUser,updateUser,getAllUser}
+//Log out
+
+const logOut = async (req,res)=>{
+    const id = req.params.id
+    const isValidId = await helper.isValidObjectID(id)
+    if(!isValidId) return res.status(400).json({
+        message: "Invalid id"
+    })
+    const existUser = await User.findById(id)
+    if(!existUser) return res.status(404).json({
+        message: "User is not found"
+    })
+    await tokenController.revokedToken(id)
+    return res.json({
+        message: "Log out successfully"
+    })
+}
+module.exports = {register,login,getUserByEmail,getUserByTopic,changePassword,deleteUser,updateUser,getAllUser, logOut}

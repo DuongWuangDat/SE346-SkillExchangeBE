@@ -9,6 +9,10 @@ const userSchema = new Schema({
         type: String,
         require: true
     },
+    phoneNumber:{
+        type: String,
+        require: true
+    },
     password:{
         type: String,
         require: true
@@ -33,18 +37,16 @@ const userSchema = new Schema({
     }],
     skill: [{
         type: String,
-        require: true
     }],
     birthDay: {
-        type: Date,
-        default: Date.now(),
+        type: Date
     },
     rankElo:{
         type: Number,
         default: 0
     }
     
-},{timestamps: true})
+})
 
 userSchema.virtual("id").get(function(){
     return this._id.toHexString

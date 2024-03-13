@@ -7,7 +7,7 @@ const topicSchema = new Schema({
     }
 })
 
-topicSchema.virtual(id).get(function(){
+topicSchema.virtual("id").get(function(){
     return this._id.toHexString
 })
 

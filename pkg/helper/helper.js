@@ -6,7 +6,7 @@ const isValidEmail =async  (email)=>{
 }
 
 const isValidPhoneNumber = async (phoneNumber) =>{
-    return await validator.isValidPhoneNumber(phoneNumber)
+    return await validator.isMobilePhone(phoneNumber)
 }
 
 const isValidObjectID = async (id) =>{
