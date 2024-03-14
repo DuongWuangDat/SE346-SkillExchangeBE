@@ -7,6 +7,8 @@ const authJwt = require("./pkg/middleware/expressJwt.js")
 const userRoute = require("./route/user_route.js")
 const topicRoute = require("./route/topic_route.js")
 const tokenRoute = require("./route/token_route.js")
+const http = require("http").Server(app)
+
 require("dotenv").config()
 
 const port = process.env.PORT
@@ -17,7 +19,7 @@ const api = process.env.API_URL
 mongoose.connect(url).then(
     res =>{
         console.log("Connect mongoDB successfully");
-        app.listen(port, ()=>{
+        http.listen(port, ()=>{
                 console.log("Listen and run at port: " + port)
         })
     }
@@ -41,3 +43,60 @@ app.get("/ping", (req,res)=>{
 app.use(`${api}/user`, userRoute)
 app.use(`${api}/topic`, topicRoute)
 app.use(`${api}/token`, tokenRoute)
+
+///--------------------Socket------------------///
+
+const io = require("socket.io")(http,{
+    cors: {
+        origin: "*",
+    },
+});
+const chatGroups = []
+
+io.on("connection", (socket)=>{
+    console.log(`${socket.id} connected`)
+
+    socket.on("createNewGroup", (groupName)=>{
+        console.log(groupName);
+        const chatModel = {
+            groupName: groupName,
+            id: chatGroups.length+1,
+            message: []
+        }
+        chatGroups.unshift(chatModel)
+        socket.emit("groupList", chatGroups)
+    })
+
+    socket.on("getAllChatGroups", ()=>{
+        socket.emit("groupList", chatGroups)
+    })
+
+    socket.on("findGroup", (id)=>{
+        const filterGroups = chatGroups.filter((item)=> item.id == id)
+        socket.emit("foundGroup", filterGroups[0].message)
+    })
+
+    socket.on("addNewMessage", (data)=>{
+        const {groupId, currentChatMessage, userId, timeData} = data
+        const filterGroups = chatGroups.filter((item)=> item.id == groupId)
+        const newMessage = {
+            id: createUniqueId(),
+            groupId: groupId,
+            currentChatMessage: currentChatMessage,
+            userId: userId,
+            timeData: `${timeData.hr}:${timeData.mins}`
+        }
+        filterGroups[0].message.push(newMessage)
+        socket.to(filterGroups[0].groupName).emit("groupMessage", newMessage)
+        socket.emit("foundGroup", filterGroups[0].message)
+        socket.emit("groupList", chatGroups)
+        
+        
+    })
+})
+
+function createUniqueId() {
+    return Math.random().toString(20).substring(2, 10);
+  }
+
+
