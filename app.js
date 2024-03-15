@@ -7,7 +7,9 @@ const authJwt = require("./pkg/middleware/expressJwt.js")
 const userRoute = require("./route/user_route.js")
 const topicRoute = require("./route/topic_route.js")
 const tokenRoute = require("./route/token_route.js")
-const http = require("http").Server(app)
+const chatRoute = require('./route/chat_route.js')
+const messageRoute = require('./route/message_route.js')
+const http = require("http").createServer(app)
 
 require("dotenv").config()
 
@@ -43,21 +45,21 @@ app.get("/ping", (req,res)=>{
 app.use(`${api}/user`, userRoute)
 app.use(`${api}/topic`, topicRoute)
 app.use(`${api}/token`, tokenRoute)
-
+app.use(`${api}/chat`,chatRoute)
+app.use(`${api}/message`, messageRoute)
 ///--------------------Socket------------------///
-
-const io = require("socket.io")(http,{
+const {Server} = require("socket.io")
+const io = new Server(http, {
     cors: {
-        origin: "*",
-    },
-});
+        origin: "*"
+    }
+})
 const chatGroups = []
-
 io.on("connection", (socket)=>{
     console.log(`${socket.id} connected`)
-
-    socket.on("createNewGroup", (groupName)=>{
-        console.log(groupName);
+    
+    socket.on("createNewGroup", (data)=>{
+        
         const chatModel = {
             groupName: groupName,
             id: chatGroups.length+1,
