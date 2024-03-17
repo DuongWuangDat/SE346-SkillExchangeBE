@@ -5,6 +5,8 @@ const moment = require("moment")
 const bcrypt = require("../pkg/auth/authorization.js")
 const auth = require("../pkg/auth/authentication.js")
 const helper = require("../pkg/helper/helper.js")
+
+
 const register = async (req,res)=>{
     const isValidEmail = await helper.isValidEmail(req.body.email)
     const isValidPhoneNumber = await helper.isValidPhoneNumber(req.body.phoneNumber)
@@ -17,7 +19,6 @@ const register = async (req,res)=>{
     const existUser = await User.findOne({
         email: req.body.email
     })
-    console.log(existUser)
     if(existUser) return res.status(400).json({
         message: "Existed email"
     })
@@ -29,22 +30,24 @@ const register = async (req,res)=>{
     var month = parseInt(dateSplit[1], 10) - 1; // Month is zero-based
     var year = parseInt(dateSplit[2], 10);
     newUser.birthDay = new Date(Date.UTC(year, month, day))
-    // await newUser.learnTopicSkill.forEach(async (topicId)=>{
-    //     const topic = await Topic.find(topicId)
-    //     if(!topic){
-    //         return res.status(400).json({
-    //             message: "Something went wrong"
-    //         })
-    //     }
-    // })
-    // await newUser.userTopicSkill.forEach(async (topicId)=>{
-    //     const topic = await Topic.find(topicId)
-    //     if(!topic){
-    //         return res.status(400).json({
-    //             message: "Something went wrong"
-    //         })
-    //     }
-    // })
+    var flag =false
+    await Promise.all(newUser.learnTopicSkill.map(async (topicId)=>{
+        const topic = await Topic.findById(topicId)
+        if(!topic){
+            flag = true
+            return
+        }
+    }))
+    await Promise.all(newUser.userTopicSkill.map(async (topicId)=>{
+        const topic = await Topic.findById(topicId)
+        if(!topic){
+            flag = true
+            return
+        }
+    }))
+    if(flag) return res.status(400).json({
+        message: "Topic not exist"
+    })
     await newUser.save().catch((err)=>{
         return res.status(400).json({
             message: "Something went wrong"
@@ -106,7 +109,8 @@ const deleteUser = async (req,res)=>{
     if(!isValidId) return res.status(400).json({
         message: "Invalid id"
     })
-   await User.findByIdAndDelete(id).catch((err)=>{
+    await tokenController.deleteTokenByUserID(id)
+    await User.findByIdAndDelete(id).catch((err)=>{
         return res.status(400).json({
             message: "Something went wrong"
         })

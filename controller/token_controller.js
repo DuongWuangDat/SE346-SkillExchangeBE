@@ -22,11 +22,11 @@ const checkTokenIsRevoked = async (token) =>{
     const tokenModel = await Token.findOne(
         {
             token: token,
-            isRevoked: true
+            isRevoked: false
         }
     )
-    if(!tokenModel) return false
-    return true
+    if(!tokenModel) return true
+    return false
 }
 
 const revokedToken = async (userId) =>{
@@ -46,5 +46,10 @@ const getAccessToken = async (refreshToken) =>{
     return token
 }
 
+const deleteTokenByUserID = async (uid) =>{
+    return await Token.deleteMany({
+        user: uid
+    })
+}
 
-module.exports = {addNewToken, checkTokenIsRevoked,revokedToken, getAccessToken}
+module.exports = {addNewToken, checkTokenIsRevoked,revokedToken, getAccessToken,deleteTokenByUserID}

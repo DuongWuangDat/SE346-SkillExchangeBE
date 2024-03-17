@@ -1,10 +1,11 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const chatSchema = new Schema({
-    members: {
-        type:Array,
+    members: [{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User",
         required: true
-    }
+    }]
 },{
     timestamps: true
 }

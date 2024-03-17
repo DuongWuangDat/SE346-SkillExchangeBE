@@ -35,11 +35,11 @@ const getChatBy2UID = async (req,res)=>{
 const createNewChat = async (req,res)=>{
     const {firstID, secondID} = req.body
     try{
-        const existChat = await chatModel.find({
+        const existChat = await chatModel.findOne({
             members: {$all: [firstID,secondID]}
         })
-        if(existChat) return res.status(200).json({
-            data: existChat
+        if(existChat) return res.status(400).json({
+            message: "Something went wrong"
         })
         const chat = new chatModel({
             members: [firstID, secondID]
@@ -54,4 +54,17 @@ const createNewChat = async (req,res)=>{
     }
     
 }
-module.exports= {getAllChatRoom,getChatBy2UID,getChatByUId,createNewChat}
+
+const deleteChatRoom =async (req, res)=>{
+    const id= req.params.id;    
+    await chatModel.findByIdAndDelete(id).catch((err)=>{
+        return res.status(400).json({
+            message: "Something went wrong"
+        })
+    })
+    return res.json({
+        message: "Deleted chat successfully"
+    })
+}
+
+module.exports= {getAllChatRoom,getChatBy2UID,getChatByUId,createNewChat,deleteChatRoom}

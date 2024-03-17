@@ -9,6 +9,8 @@ const topicRoute = require("./route/topic_route.js")
 const tokenRoute = require("./route/token_route.js")
 const chatRoute = require('./route/chat_route.js')
 const messageRoute = require('./route/message_route.js')
+const requestRoute = require("./route/request_route.js")
+const uploadRoute = require("./route/upload_route.js")
 const http = require("http").createServer(app)
 
 require("dotenv").config()
@@ -36,6 +38,7 @@ app.use(morgan('dev'))
 app.use(cors())
 app.use(express.json())
 app.use(authJwt())
+app.use('/public/uploads', express.static(__dirname + '/public/uploads'))
 app.get("/ping", (req,res)=>{
     return res.status(200).json({
         message: "pong"
@@ -47,6 +50,8 @@ app.use(`${api}/topic`, topicRoute)
 app.use(`${api}/token`, tokenRoute)
 app.use(`${api}/chat`,chatRoute)
 app.use(`${api}/message`, messageRoute)
+app.use(`${api}/request`,requestRoute)
+app.use(`${api}/image`, uploadRoute)
 ///--------------------Socket------------------///
 const {Server} = require("socket.io")
 const io = new Server(http, {

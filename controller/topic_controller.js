@@ -2,6 +2,12 @@ const Topic = require("../model/topic.js")
 const User = require("../model/user.js")
 const helper = require("../pkg/helper/helper.js")
 const addNewTopic = async (req,res)=>{
+    const existTopic = await Topic.findOne({
+        name: req.body.name
+    })
+    if(existTopic) return res.status(400).json({
+        message: "Existed topic"
+    })
     const topic = new Topic(req.body)
     topic.save().catch((err)=>{
         return res.status(400).json({
@@ -15,7 +21,7 @@ const addNewTopic = async (req,res)=>{
 }
 
 const getAllTopic = async (req,res)=>{
-    const topic = Topic.find()
+    const topic = await Topic.find()
     return res.json({
         data: topic
     })
@@ -43,31 +49,35 @@ const deleteTopic = async (req,res) =>{
     if(!isValidId) return res.status(400).json({
         message: "Invalid id"
     })
-    
+    const user = await User.find({
+        $or: [
+            {userTopicSkill: {$in: [id]}},
+            {learnTopicSkill: {$in: [id]}}
+        ]
+    })
+    console.log(user)
+    user.forEach(async (element)=>{
+        const userTopicSkillIndex = element.userTopicSkill.indexOf(id)
+        const learnTopicSkillIndex = element.learnTopicSkill.indexOf(id)
+        const userTopicSkill = element.userTopicSkill
+        const learnTopicSkill = element.learnTopicSkill
+        if(userTopicSkillIndex!= -1) {
+            userTopicSkill.splice(userTopicSkillIndex,1)
+        }
+        if(learnTopicSkillIndex!= -1) {
+            learnTopicSkill.splice(learnTopicSkillIndex,1)
+        }
+        await User.findByIdAndUpdate(element._id,{
+            userTopicSkill: userTopicSkill,
+            learnTopicSkill: learnTopicSkill
+        })
+    })
     await Topic.findByIdAndDelete(id).catch(err=>{
         return res.status(400).json({
             message: "Something went wrong"
         })
     })
-    const user = await User.find({
-        $or: [
-            {userTopicSkill: {$in: id}},
-            {learnTopicSkill: {$in: id}}
-        ]
-    })
-
-    if(user){
-        const userChange = new User(user)
-        const userTopicSkillIndex = userChange.userTopicSkill.indexOf(id)
-        const learnTopicSkillIndex = userChange.learnTopicSkill.indexOf(id)
-        if(userTopicSkillIndex!= -1) {
-            userChange.userTopicSkill.splice(userTopicSkillIndex,1)
-        }
-        if(learnTopicSkillIndex!= -1) {
-            userChange.userTopicSkill.splice(learnTopicSkillIndex,1)
-        }
-        await User.findByIdAndUpdate(user._id, userChange)
-    }
+    
     
     
     return res.json({
@@ -99,8 +109,9 @@ const getTopicLimit = async (req,res)=>{
     })
 }
 const getTopicPagination = async (req,res)=>{
-    const limit = req.query.limit
-    const page = req.query.page
+    const page = parseInt(req.query.page)
+    const limit = parseInt(req.query.limit)
+    
     const topics = await Topic.aggregate([
         {$skip: (page-1)*limit},
         {$limit: limit}

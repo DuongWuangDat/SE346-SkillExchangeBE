@@ -7,7 +7,7 @@ route.delete("/delete/:id",topicController.deleteTopic)
 route.patch("/update/:id", topicController.updateTopic)
 route.get("/find", topicController.getAllTopic)
 route.get("/find/:id", topicController.getTopicById)
-route.get("/find/:limit", topicController.getTopicLimit)
-route.get("/find/pagination", topicController.getTopicPagination)
+route.get("/limit/:limit", topicController.getTopicLimit)
+route.get("/pagination", topicController.getTopicPagination)
 
 module.exports = route
