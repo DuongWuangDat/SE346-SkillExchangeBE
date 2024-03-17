@@ -1,4 +1,5 @@
 const chatModel = require('../model/chat.js')
+const Message = require("../model/message.js")
 //get all chatroom
 const getAllChatRoom = async (req,res)=>{
     const chat = await chatModel.find().catch((err)=>{console.log(err)})
@@ -56,12 +57,20 @@ const createNewChat = async (req,res)=>{
 }
 
 const deleteChatRoom =async (req, res)=>{
-    const id= req.params.id;    
+    const id= req.params.id;  
+    await Message.deleteMany({
+        chatID: id
+    }).catch((err)=>{
+        return res.status(400).json({
+            message: "Something went wrong"
+        })
+    })
     await chatModel.findByIdAndDelete(id).catch((err)=>{
         return res.status(400).json({
             message: "Something went wrong"
         })
     })
+
     return res.json({
         message: "Deleted chat successfully"
     })

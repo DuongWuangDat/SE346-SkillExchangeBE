@@ -5,7 +5,7 @@ const moment = require("moment")
 const bcrypt = require("../pkg/auth/authorization.js")
 const auth = require("../pkg/auth/authentication.js")
 const helper = require("../pkg/helper/helper.js")
-
+const Message = require("../model/message.js")
 
 const register = async (req,res)=>{
     const isValidEmail = await helper.isValidEmail(req.body.email)
@@ -110,6 +110,15 @@ const deleteUser = async (req,res)=>{
         message: "Invalid id"
     })
     await tokenController.deleteTokenByUserID(id)
+    await Message.deleteMany(
+        {
+            senderID: id
+        }
+    ).catch((err)=>{
+        return res.status(400).json({
+            message: "Something went wrong"
+        })
+    })
     await User.findByIdAndDelete(id).catch((err)=>{
         return res.status(400).json({
             message: "Something went wrong"
