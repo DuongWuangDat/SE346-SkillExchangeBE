@@ -11,6 +11,7 @@ const chatRoute = require('./route/chat_route.js')
 const messageRoute = require('./route/message_route.js')
 const requestRoute = require("./route/request_route.js")
 const uploadRoute = require("./route/upload_route.js")
+require("./cronjob.js")
 const http = require("http").createServer(app)
 
 require("dotenv").config()
