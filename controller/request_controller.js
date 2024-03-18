@@ -9,7 +9,8 @@ const createNewRequest = async (req,res)=>{
         message: "Existed request"
     })
     const request = new Request({
-        member: [senderID,receiverID]
+        senderID: senderID,
+        receiverID:receiverID
     })
     await request.save().catch((err)=>{
         return res.status(400).json({
@@ -30,7 +31,26 @@ const getRequestBySenderId = async (req,res) =>{
         message: "Invalid id"
     })
     const request = await Request.find({
-        member: {$in: [senderID]}
+        senderID: senderID
+    }).catch((err)=>{
+        return res.status(400).json({
+            message: "Something went wrong"
+        })
+    })
+
+    return res.json({
+        data: request
+    })
+}
+
+const getRequestByRecieverId = async (req,res) =>{
+    const receiverID= req.params.receiverID
+    const isValidId = await helper.isValidObjectID(receiverID)
+    if(!isValidId) return res.status(400).json({
+        message: "Invalid id"
+    })
+    const request = await Request.find({
+        receiverID: receiverID
     }).catch((err)=>{
         return res.status(400).json({
             message: "Something went wrong"
@@ -59,4 +79,4 @@ const deleteRequest = async(req,res)=>{
     })
 }
 
-module.exports = {deleteRequest,createNewRequest,getRequestBySenderId}
+module.exports = {deleteRequest,createNewRequest,getRequestBySenderId, getRequestByRecieverId}

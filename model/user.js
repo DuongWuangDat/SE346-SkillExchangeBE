@@ -20,13 +20,13 @@ const userSchema = new Schema({
     avatar:{
         type: String
     },
-    imgaeDisplay: [{
+    imageDisplay: [{
         type: String,
         required: true
     }],
-    imageCerti: {
+    imageCerti: [{
         type: String
-    },
+    }],
     userTopicSkill: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Topic'

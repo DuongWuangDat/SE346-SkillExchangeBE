@@ -102,7 +102,7 @@ const updateTopic = async (req,res) =>{
 }
 
 const getTopicLimit = async (req,res)=>{
-    const limit = req.params.limit
+    const limit = parseInt(req.params.limit);
     const topics = await Topic.find().limit(limit)
     return res.json({
         data: topics

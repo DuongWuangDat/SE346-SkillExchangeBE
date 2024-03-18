@@ -34,8 +34,8 @@ const getMessageByChatID = async(req,res)=>{
 //message in chat room ID by senderID
 const getMessageByBoth =async(req,res)=>{
     try{
-        const chatID = req.params.chatID
-        const senderID = req.params.senderID
+        const chatID = req.query.chatID
+        const senderID = req.query.senderID
         const message = await Message.find({chatID: chatID, senderID:senderID})
         res.json({
             data: message
