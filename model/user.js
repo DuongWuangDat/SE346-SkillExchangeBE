@@ -20,11 +20,10 @@ const userSchema = new Schema({
     avatar:{
         type: String
     },
-    imageDisplay: [{
-        type: String,
-        required: true
-    }],
     imageCerti: [{
+        type: String
+    }],
+    description:[{
         type: String
     }],
     userTopicSkill: [{

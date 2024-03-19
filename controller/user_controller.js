@@ -91,8 +91,18 @@ const login = async (req,res)=>{
 const getUserByTopic= async (req,res)=>{
     const topics = req.query.topics
     const topicList = topics.split(',')
+    const topicIdList = await Promise.all(topicList.map(async (topicname)=>{
+        const topic = await Topic.findOne({
+            name: topicname
+        })
+        console.log(topic);
+        if(topic != null){
+            return topic._id;
+        }
+        
+    }))
     const user = await User.find({
-        userTopicSkill: {$in: topicList}
+        userTopicSkill: {$in: topicIdList}
     }).select('-password')
     if(!user) return res.status(404).json({
         message: "User is not found"

@@ -4,7 +4,7 @@ const route = express.Router()
 
 route.post("/register", userController.register)
 route.post("/login", userController.login)
-route.patch("/changePassword/:id", userController.changePassword)
+route.patch("/changePassword", userController.changePassword)
 route.delete("/delete/:id", userController.deleteUser)
 route.patch("/update/:id", userController.updateUser)
 route.get("/find/topic",userController.getUserByTopic)
