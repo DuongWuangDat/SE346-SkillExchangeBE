@@ -2,22 +2,37 @@ const Topic = require("../model/topic.js")
 const User = require("../model/user.js")
 const helper = require("../pkg/helper/helper.js")
 const addNewTopic = async (req,res)=>{
-    const existTopic = await Topic.findOne({
-        name: req.body.name
-    })
-    if(existTopic) return res.status(400).json({
-        message: "Existed topic"
-    })
-    const topic = new Topic(req.body)
-    topic.save().catch((err)=>{
-        return res.status(400).json({
-            message: "Something went wrong"
+    
+}
+
+const addManyTopic =async (req,res)=>{
+    const topics = req.body.topics
+    const flag= false
+    await Promise.all(topics.map(async (topicname)=>{
+        const existTopic = await Topic.findOne({
+            name: topicname
         })
-    })
+        if(existTopic) {
+            flag=true
+            return res.status(400).json({
+            message: "Existed topic"
+        })}
+        const topic = new Topic({
+            name: topicname
+        })
+        topic.save().catch((err)=>{
+            flag=true
+            return res.status(400).json({
+                message: "Something went wrong"
+            })
+        })
+    }))
+    if(flag) return;
     return res.json({
-        message: "Created successfully",
-        data: topic
+        message: "Add many topic successfully"
     })
+
+
 }
 
 const getAllTopic = async (req,res)=>{
@@ -120,4 +135,4 @@ const getTopicPagination = async (req,res)=>{
         data: topics
     })
 }
-module.exports = {updateTopic,deleteTopic,getAllTopic,getTopicById,addNewTopic, getTopicLimit,getTopicPagination}
+module.exports = {updateTopic,deleteTopic,getAllTopic,getTopicById,addNewTopic, getTopicLimit,getTopicPagination, addManyTopic}

@@ -3,6 +3,7 @@ const express = require("express")
 const route = express.Router()
 
 route.post("/create", topicController.addNewTopic)
+route.post("/create/many", topicController.addManyTopic)
 route.delete("/delete/:id",topicController.deleteTopic)
 route.patch("/update/:id", topicController.updateTopic)
 route.get("/find", topicController.getAllTopic)
