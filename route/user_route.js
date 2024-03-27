@@ -10,5 +10,6 @@ route.patch("/update/:id", userController.updateUser)
 route.get("/find/topic",userController.getUserByTopic)
 route.get("/find",userController.getAllUser)
 route.get("/find/email", userController.getUserByEmail)
+route.get("/findbyid/:id", userController.getUserById)
 route.post("/logout/:id", userController.logOut)
 module.exports = route

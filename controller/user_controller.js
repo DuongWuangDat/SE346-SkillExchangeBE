@@ -221,6 +221,22 @@ const getAllUser = async (req,res)=>{
         data: userList
     })
 }
+
+const getUserById = async(req,res)=>{
+    const id = req.params.id
+    const isValidId = await helper.isValidObjectID(id)
+    if(!isValidId) return res.status(400).json({
+        message: "Invalid id"
+    })
+    const existUser = await User.findById(id).select('-password')
+    if(!existUser) return res.status(404).json({
+        message: "User is not found"
+    })
+    return res.json({
+        data: existUser
+    })
+}
+
 //Log out
 
 const logOut = async (req,res)=>{
@@ -238,4 +254,4 @@ const logOut = async (req,res)=>{
         message: "Log out successfully"
     })
 }
-module.exports = {register,login,getUserByEmail,getUserByTopic,changePassword,deleteUser,updateUser,getAllUser, logOut}
+module.exports = {register,login,getUserByEmail,getUserByTopic,changePassword,deleteUser,updateUser,getAllUser, logOut, getUserById}
