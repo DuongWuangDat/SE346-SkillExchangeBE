@@ -11,6 +11,7 @@ const authJWT = ()=>{
         path: [
             `${api}/user/register`,
             `${api}/user/login`,
+            `${api}/user/changepassword`,
             {url: /\/api\/v1\/topic(.*)/},
             `${api}/image/upload`,
             {url: /\/public\/uploads(.*)/},

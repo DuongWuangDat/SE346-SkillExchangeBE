@@ -12,9 +12,31 @@ const getChatByUId = async (req,res)=>{
     const firstID = req.params.uid
     const chat = await chatModel.find({
         members: {$in: [firstID]}
-    })
+    }).populate('members', 'username avatar')
+    
+    const dataChat = {
+        chatInfo,
+        latestMessage
+    }
+    const dataChatList = []
+    await Promise.all(chat.map( async (room)=>{
+        const latestMessage = await Message.aggregate([
+            {$match: {chatID: room._id}},
+            {$sort: {dateTime: -1}},
+            {$limit: 1}
+        ]).catch((err)=>{
+            return res.status(400).json({
+                message: "Something went wrong"
+            })
+        })
+        const dataChat = {
+            chatInfo: room,
+            latestMessage: latestMessage
+        }
+        dataChatList.push(dataChat)
+    }))
     res.json({
-        data: chat
+        data: dataChatList
     })
 }
 //get chat by 2 uid
@@ -23,7 +45,7 @@ const getChatBy2UID = async (req,res)=>{
     try{
         const chat = await chatModel.find({
             members: {$all: [firstID,secondID]}
-        })
+        }).populate("members", 'username avatar')
         res.json({
             data: chat
         })

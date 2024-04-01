@@ -9,6 +9,10 @@ const messageSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     },
+    dateTime:{
+        type: Date,
+        default: Date.now
+    },
     text: String
 },{
     timestamps: true
