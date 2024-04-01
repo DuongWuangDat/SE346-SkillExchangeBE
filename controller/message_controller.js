@@ -22,7 +22,7 @@ const sendMessage = async(req,res)=>{
 const getMessageByChatID = async(req,res)=>{
     try{
         const chatID = req.params.chatID
-        const message = await Message.find({chatID: chatID})
+        const message = await Message.find({chatID: chatID}).populate("senderID", "username avatar")
         res.json({
             data: message
         })
@@ -36,7 +36,7 @@ const getMessageByBoth =async(req,res)=>{
     try{
         const chatID = req.query.chatID
         const senderID = req.query.senderID
-        const message = await Message.find({chatID: chatID, senderID:senderID})
+        const message = await Message.find({chatID: chatID, senderID:senderID}).populate("senderID", "username avatar")
         res.json({
             data: message
         })

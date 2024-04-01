@@ -16,11 +16,11 @@ const getChatByUId = async (req,res)=>{
     
     const dataChatList = []
     await Promise.all(chat.map( async (room)=>{
-        const latestMessage = await Message.aggregate([
-            {$match: {chatID: room._id}},
-            {$sort: {dateTime: -1}},
-            {$limit: 1}
-        ]).catch((err)=>{
+        const latestMessage = await Message.find({
+            chatID: room._id
+        }).sort({
+            dateTime: -1
+        }).limit(1).populate('senderID', 'username').catch((err)=>{
             return res.status(400).json({
                 message: "Something went wrong"
             })
