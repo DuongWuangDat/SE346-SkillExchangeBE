@@ -14,10 +14,6 @@ const getChatByUId = async (req,res)=>{
         members: {$in: [firstID]}
     }).populate('members', 'username avatar')
     
-    const dataChat = {
-        chatInfo,
-        latestMessage
-    }
     const dataChatList = []
     await Promise.all(chat.map( async (room)=>{
         const latestMessage = await Message.aggregate([

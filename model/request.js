@@ -10,6 +10,10 @@ const requestSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         require: true
+    },
+    dateTime: {
+        type: Date,
+        default: Date.now,
     }
 })
 

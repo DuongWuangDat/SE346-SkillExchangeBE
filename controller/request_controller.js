@@ -51,7 +51,7 @@ const getRequestByRecieverId = async (req,res) =>{
     })
     const request = await Request.find({
         receiverID: receiverID
-    }).populate('recieverID', 'username avatar').catch((err)=>{
+    }).populate('senderID', 'username avatar').catch((err)=>{
         return res.status(400).json({
             message: "Something went wrong"
         })
