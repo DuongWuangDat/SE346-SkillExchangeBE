@@ -14,7 +14,7 @@ const isValidObjectID = async (id) =>{
 }
 
 const randomCode =()=>{
-    const codeInit = "  QWERTYUIOPASDFGHJKLZXCVBNM1234567890"
+    const codeInit = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890"
     let code = ""
     for(let i =0; i<6;i++){
         const index = Math.floor(Math.random()*codeInit.length)
