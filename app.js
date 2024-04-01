@@ -11,6 +11,7 @@ const chatRoute = require('./route/chat_route.js')
 const messageRoute = require('./route/message_route.js')
 const requestRoute = require("./route/request_route.js")
 const uploadRoute = require("./route/upload_route.js")
+const serviceRoute = require("./route/service_route.js")
 const http = require("http").createServer(app)
 
 require("dotenv").config()
@@ -52,6 +53,7 @@ app.use(`${api}/chat`,chatRoute)
 app.use(`${api}/message`, messageRoute)
 app.use(`${api}/request`,requestRoute)
 app.use(`${api}/image`, uploadRoute)
+app.use(`${api}/service`, serviceRoute)
 ///--------------------Socket------------------///
 const {Server} = require("socket.io")
 const io = new Server(http, {
