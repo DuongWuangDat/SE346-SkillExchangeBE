@@ -200,7 +200,7 @@ const getUserByEmail = async (req,res) =>{
     if(!isValidEmail) return res.status(400).json({
         message: "Invalid email"
     })
-    const existUser = await User.find({
+    const existUser = await User.findOne({
         email: req.body.email
     }).select('-password')
     if(!existUser) return res.status(404).json({
