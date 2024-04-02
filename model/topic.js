@@ -4,6 +4,9 @@ const topicSchema = new Schema({
     name: {
         type: String,
         require: true
+    },
+    imageUrl: {
+        type: String
     }
 })
 
