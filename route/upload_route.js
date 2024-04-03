@@ -5,7 +5,6 @@ const { getStorage, ref, getDownloadURL, uploadBytesResumable } = require("fireb
 
 const express = require("express")
 const route = express.Router()
-const config = require("../pkg/config/firebaseConfig")
 
 const multer = require("multer")
 
