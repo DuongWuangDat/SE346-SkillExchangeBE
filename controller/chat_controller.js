@@ -42,8 +42,25 @@ const getChatBy2UID = async (req,res)=>{
         const chat = await chatModel.find({
             members: {$all: [firstID,secondID]}
         }).populate("members", 'username avatar')
+        const dataChatList = []
+        await Promise.all(chat.map( async (room)=>{
+            const latestMessage = await Message.find({
+                chatID: room._id
+            }).sort({
+                dateTime: -1
+            }).limit(1).populate('senderID', 'username').catch((err)=>{
+                return res.status(400).json({
+                    message: "Something went wrong"
+                })
+            })
+            const dataChat = {
+                chatInfo: room,
+                latestMessage: latestMessage
+            }
+            dataChatList.push(dataChat)
+        }))
         res.json({
-            data: chat
+            data: dataChatList
         })
     }
     catch(err){

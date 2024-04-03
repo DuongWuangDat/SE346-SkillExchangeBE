@@ -13,7 +13,14 @@ const messageSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    text: String
+    text: {
+        type: String,
+        require: true,
+    },
+    isFile:{
+        type: Boolean,
+        require: true,
+    }
 },{
     timestamps: true
 })
