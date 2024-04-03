@@ -52,7 +52,7 @@ app.use(`${api}/token`, tokenRoute)
 app.use(`${api}/chat`,chatRoute)
 app.use(`${api}/message`, messageRoute)
 app.use(`${api}/request`,requestRoute)
-app.use(`${api}/image`, uploadRoute)
+app.use(`${api}/upload`, uploadRoute)
 app.use(`${api}/service`, serviceRoute)
 ///--------------------Socket------------------///
 const {Server} = require("socket.io")

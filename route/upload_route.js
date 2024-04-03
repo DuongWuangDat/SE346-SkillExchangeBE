@@ -2,10 +2,9 @@
 //import { getStorage, ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 const {initializeApp} = require("firebase/app")
 const { getStorage, ref, getDownloadURL, uploadBytesResumable } = require("firebase/storage")
-
+const path = require("path")
 const express = require("express")
 const route = express.Router()
-
 const multer = require("multer")
 
 initializeApp({
@@ -24,14 +23,12 @@ const storage = getStorage();
 
 const uploadOptions = multer({storage: multer.memoryStorage()})
 
-route.post("/upload", uploadOptions.single("image"),async (req,res)=>{
+route.post("/image", uploadOptions.single("image"),async (req,res)=>{
     
     const file = req.file;
     if(!file) return res.status(400).send('No image in the request')
-    const curDate = new Date();
-    const curMili = curDate.getMilliseconds();
 
-    const storageRef = ref(storage, `files/${req.file.originalname}-${curMili}`)
+    const storageRef = ref(storage, `files/${req.file.originalname}`)
 
     const metaData= {
         contentType: req.file.mimetype
@@ -45,4 +42,26 @@ route.post("/upload", uploadOptions.single("image"),async (req,res)=>{
     })
 })
 
+route.post("/file", uploadOptions.single("file"),async(req,res)=>{
+    const file = req.file;
+    if(!file) return res.status(400).send('No file in the request')
+    const curDate = new Date();
+    const curMili = curDate.getMilliseconds();
+    const fileName = path.basename(req.file.originalname, path.extname(req.file.originalname))
+    const extension = path.extname(req.file.originalname)
+    const storageRef = ref(storage, `files/${fileName}${extension}`)
+
+    const metaData= {
+        contentType: req.file.mimetype
+    }
+
+    const snapShot = await uploadBytesResumable(storageRef,req.file.buffer,metaData)
+
+    const downloadURL = await getDownloadURL(snapShot.ref)
+    return res.json({
+        image: downloadURL,
+        fileName: fileName,
+        extension: extension
+    })
+})
 module.exports = route
