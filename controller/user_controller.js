@@ -53,9 +53,8 @@ const register = async (req,res)=>{
             message: "Something went wrong"
         })
     })
-    const accessToken = await auth.generateToken(newUser, "1d")
-    const refreshToken = await auth.generateToken(newUser, "30d")
-    tokenController.addNewToken(accessToken, newUser._id)
+    const accessToken = await auth.generateToken(newUser, "1h",'access')
+    const refreshToken = await auth.generateToken(newUser, "30d", 'refresh')
     tokenController.addNewToken(refreshToken, newUser._id)
     return res.json({
         accessToken: accessToken,
@@ -79,9 +78,8 @@ const login = async (req,res)=>{
     const user = await User.findOne({
         email: req.body.email
     }).select('-password')
-    const accessToken = await auth.generateToken(existUser,"1d")
-    const refreshToken = await auth.generateToken(existUser, "30d")
-    tokenController.addNewToken(accessToken, user._id)
+    const accessToken = await auth.generateToken(existUser,"1h", 'access')
+    const refreshToken = await auth.generateToken(existUser, "30d", 'refresh')
     tokenController.addNewToken(refreshToken, user._id)
     return res.json({
         access_token: accessToken,
@@ -242,16 +240,22 @@ const getUserById = async(req,res)=>{
 //Log out
 
 const logOut = async (req,res)=>{
-    const id = req.params.id
-    const isValidId = await helper.isValidObjectID(id)
-    if(!isValidId) return res.status(400).json({
-        message: "Invalid id"
-    })
-    const existUser = await User.findById(id)
-    if(!existUser) return res.status(404).json({
-        message: "User is not found"
-    })
-    await tokenController.revokedToken(id)
+    const header = req.headers.authorization
+    const split = header.split(" ")
+    const refreshToken = split[1]
+    try{
+        const tokenFind = await tokenController.revokedToken(refreshToken)
+        if(!tokenFind) {
+            return res.status(400).json({
+                message: "Invalid refresh token"
+            })
+        }
+    }
+    catch{
+        return res.status(400).json({
+            message: "Something went wrong"
+        })
+    }
     return res.json({
         message: "Log out successfully"
     })

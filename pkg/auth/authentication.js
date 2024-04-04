@@ -1,10 +1,11 @@
 const jwt = require("jsonwebtoken")
 require("dotenv").config()
 const secret = process.env.SECRET_KEY
-const generateToken = async (payload, expired) =>{
+const generateToken = async (payload, expired, type) =>{
     return await jwt.sign(
         {
-            userId: payload._id
+            userId: payload._id,
+            type: type
         },
         secret,
         {

@@ -11,4 +11,11 @@ route.get("/refresh-token", async (req,res)=>{
         access_token: newToken
     })
 })
+
+route.delete("/deleteall", async (req,res)=>{
+    await tokenController.deleteAllToken()
+    return res.json({
+        message: "Deleted successfully"
+    })
+})
 module.exports= route

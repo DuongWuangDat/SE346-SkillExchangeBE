@@ -15,7 +15,8 @@ const authJWT = ()=>{
             {url: /\/api\/v1\/topic(.*)/},
             `${api}/upload/image`,
             {url: /\/public\/uploads(.*)/},
-            `${api}/service/sendEmail`
+            `${api}/service/sendEmail`,
+            `${api}/token/deleteall`
         ]
     })
 }
@@ -23,7 +24,6 @@ const authJWT = ()=>{
 isRevoked = async (req,token)=>{
     const tokenString = getTokenFromJWT(token)
     const isRevokedToken = await tokenController.checkTokenIsRevoked(tokenString)
-    console.log(isRevokedToken)
     return isRevokedToken
 }
 

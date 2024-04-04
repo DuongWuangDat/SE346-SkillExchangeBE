@@ -2,13 +2,9 @@ const Token = require("../model/token.js")
 const auth = require("../pkg/auth/authentication.js")
 const User = require("../model/user.js")
 const addNewToken = async (token, userID)=>{
-    await Token.updateMany({
-        user: userID
-    }, {isRevoked: true})
     const tokenModel= new Token({
         token: token,
-        user: userID,
-        isRevoked: false
+        user: userID
     })
     await tokenModel.save().catch(
         err=>{
@@ -19,10 +15,14 @@ const addNewToken = async (token, userID)=>{
 }
 
 const checkTokenIsRevoked = async (token) =>{
+    const jwt = await auth.verifyToken(token)
+    const type = jwt.type
+    if(type == 'access'){
+        return false
+    }
     const tokenModel = await Token.findOne(
         {
-            token: token,
-            isRevoked: false
+            token: token
         }
     )
     if(!tokenModel) return true
@@ -30,19 +30,17 @@ const checkTokenIsRevoked = async (token) =>{
 }
 
 const revokedToken = async (token) =>{
-    await Token.updateMany({
+    const tokenFind = await Token.findOneAndDelete({
         token: token
-    }, {
-        isRevoked: true
     })
+    return tokenFind
 }
 
 const getAccessToken = async (refreshToken) =>{
     const jwt = await auth.verifyToken(refreshToken)
     const id= jwt.userId
     const user = await User.findById(id)
-    const token =  await auth.generateToken(user, "1d")
-    addNewToken(token)
+    const token =  await auth.generateToken(user, "1h", 'access')
     return token
 }
 
@@ -52,4 +50,8 @@ const deleteTokenByUserID = async (uid) =>{
     })
 }
 
-module.exports = {addNewToken, checkTokenIsRevoked,revokedToken, getAccessToken,deleteTokenByUserID}
+
+const deleteAllToken = async ()=>{
+    return await Token.deleteMany({});
+}
+module.exports = {addNewToken, checkTokenIsRevoked,revokedToken, getAccessToken,deleteTokenByUserID, deleteAllToken}

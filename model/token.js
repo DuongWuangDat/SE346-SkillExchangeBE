@@ -9,10 +9,6 @@ const tokenSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         require: true
-    },
-    isRevoked: {
-        type: Boolean,
-        default: true
     }
 }, {timestamps: true})
 
