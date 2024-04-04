@@ -29,9 +29,9 @@ const checkTokenIsRevoked = async (token) =>{
     return false
 }
 
-const revokedToken = async (userId) =>{
+const revokedToken = async (token) =>{
     await Token.updateMany({
-        user: userId
+        token: token
     }, {
         isRevoked: true
     })
