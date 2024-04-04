@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
+
 const messageSchema = new Schema({
     chatID: {
         type: mongoose.Schema.Types.ObjectId,
@@ -13,13 +14,14 @@ const messageSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    text: {
+    content: {
         type: String,
         require: true,
     },
-    isFile:{
-        type: Boolean,
-        require: true,
+    type: {
+        type: String,
+        enum: ['image', 'record', 'text', 'video', 'file'],
+        default: 'text'
     }
 },{
     timestamps: true
