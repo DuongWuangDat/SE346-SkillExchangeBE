@@ -212,7 +212,7 @@ const getUserByEmail = async (req,res) =>{
 }
 
 const getAllUser = async (req,res)=>{
-    const userList = await User.find().catch((err)=>{
+    const userList = await User.find().select('-password').catch((err)=>{
         return res.status(400).json({
             message: "Something went wrong"
         })
