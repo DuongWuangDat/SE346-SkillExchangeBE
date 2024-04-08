@@ -16,13 +16,15 @@ const register = async (req,res)=>{
     if(!isValidPhoneNumber) return res.status(400).json({
         message: "Invalid phone number"
     })
+    var email = req.body.email.toLowerCase()
     const existUser = await User.findOne({
-        email: req.body.email
+        email: email
     })
     if(existUser) return res.status(400).json({
         message: "Existed email"
     })
     const newUser = new User(req.body)
+    newUser.email = email
     newUser.password =await  bcrypt.hashPassword(newUser.password)
     const dateString = req.body.birthDay
     const dateSplit = dateString.split("/")
@@ -65,8 +67,9 @@ const register = async (req,res)=>{
 }
 
 const login = async (req,res)=>{
+    var email = req.body.email.toLowerCase()
     const existUser = await User.findOne({
-        email: req.body.email
+        email: email
     })
     if(!existUser) return res.status(404).json({
         message: "User is not found"
@@ -76,7 +79,7 @@ const login = async (req,res)=>{
         message: "Unauthorized"
     })
     const user = await User.findOne({
-        email: req.body.email
+        email: email
     }).select('-password')
     const accessToken = await auth.generateToken(existUser,"1h", 'access')
     const refreshToken = await auth.generateToken(existUser, "30d", 'refresh')
