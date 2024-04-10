@@ -10,5 +10,5 @@ route.get("/find", topicController.getAllTopic)
 route.get("/find/:id", topicController.getTopicById)
 route.get("/limit/:limit", topicController.getTopicLimit)
 route.get("/pagination", topicController.getTopicPagination)
-
+route.delete("/deleteall", topicController.deleteAll)
 module.exports = route

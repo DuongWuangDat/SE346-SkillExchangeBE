@@ -135,4 +135,11 @@ const getTopicPagination = async (req,res)=>{
         data: topics
     })
 }
-module.exports = {updateTopic,deleteTopic,getAllTopic,getTopicById,addNewTopic, getTopicLimit,getTopicPagination, addManyTopic}
+
+const deleteAll = async (req,res)=>{
+    await Topic.deleteMany({});
+    return res.json({
+        message: "Delete all topic success fully"
+    })
+}
+module.exports = {updateTopic,deleteTopic,getAllTopic,getTopicById,addNewTopic, getTopicLimit,getTopicPagination, addManyTopic, deleteAll}
