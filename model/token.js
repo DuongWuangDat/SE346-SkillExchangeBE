@@ -3,12 +3,12 @@ const Schema = mongoose.Schema
 const tokenSchema = new Schema({
     token: {
         type: String,
-        require: true
+        required: true
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        require: true
+        required: true
     }
 }, {timestamps: true})
 

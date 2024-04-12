@@ -4,12 +4,12 @@ const requestSchema = new Schema({
     senderID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        require: true
+        required: true
     },
     recieverID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        require: true
+        required: true
     },
     dateTime: {
         type: Date,

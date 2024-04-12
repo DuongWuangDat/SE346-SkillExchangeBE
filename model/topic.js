@@ -3,7 +3,7 @@ const Schema = mongoose.Schema
 const topicSchema = new Schema({
     name: {
         type: String,
-        require: true
+        required: true
     },
     imageUrl: {
         type: String
