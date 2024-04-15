@@ -1,23 +1,28 @@
+
 const Request = require("../model/request.js")
 const helper = require("../pkg/helper/helper.js")
 const createNewRequest = async (req,res)=>{
     const {senderID, receiverID} = req.body
     const existRequest = await Request.findOne({
-        member: {$all: [senderID, receiverID]}
+        senderID : senderID,
+        recieverID: receiverID
     })
     if(existRequest) return res.status(400).json({
         message: "Existed request"
     })
+    console.log("Pass")
     const request = new Request({
         senderID: senderID,
-        receiverID:receiverID
+        recieverID: receiverID
     })
+    let isSuccess = true;
     await request.save().catch((err)=>{
-        return res.status(400).json({
-            message: "Something went wrong"
-        })
+        isSuccess=false;
+        
     })
-
+    if(!isSuccess)  return res.status(400).json({
+        message: "Something went wrong"
+    })
     return res.status(200).json({
         message: "Created new request successfully",
         data: request
