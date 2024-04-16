@@ -50,10 +50,13 @@ const register = async (req,res)=>{
     if(flag) return res.status(400).json({
         message: "Topic not exist"
     })
+    let isSuccess = true;
     await newUser.save().catch((err)=>{
-        return res.status(400).json({
-            message: "Something went wrong"
-        })
+        isSuccess = false;
+        
+    })
+    if(!isSuccess) return res.status(400).json({
+        message: "Something went wrong"
     })
     const accessToken = await auth.generateToken(newUser, "1h",'access')
     const refreshToken = await auth.generateToken(newUser, "30d", 'refresh')

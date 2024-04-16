@@ -5,7 +5,7 @@ const createNewRequest = async (req,res)=>{
     const {senderID, receiverID} = req.body
     const existRequest = await Request.findOne({
         senderID : senderID,
-        recieverID: receiverID
+        receiverID: receiverID
     })
     if(existRequest) return res.status(400).json({
         message: "Existed request"
@@ -13,7 +13,7 @@ const createNewRequest = async (req,res)=>{
     console.log("Pass")
     const request = new Request({
         senderID: senderID,
-        recieverID: receiverID
+        receiverID: receiverID
     })
     let isSuccess = true;
     await request.save().catch((err)=>{
@@ -30,6 +30,7 @@ const createNewRequest = async (req,res)=>{
 }
 
 const getRequestBySenderId = async (req,res) =>{
+    console.log("Sender id")
     const senderID= req.params.senderID
     const isValidId = await helper.isValidObjectID(senderID)
     if(!isValidId) return res.status(400).json({
@@ -37,7 +38,7 @@ const getRequestBySenderId = async (req,res) =>{
     })
     const request = await Request.find({
         senderID: senderID
-    }).populate('recieverID', 'username avatar').catch((err)=>{
+    }).populate('receiverID', 'username avatar').catch((err)=>{
         return res.status(400).json({
             message: "Something went wrong"
         })
@@ -49,6 +50,7 @@ const getRequestBySenderId = async (req,res) =>{
 }
 
 const getRequestByRecieverId = async (req,res) =>{
+    console.log("Recieve id")
     const receiverID= req.params.receiverID
     const isValidId = await helper.isValidObjectID(receiverID)
     if(!isValidId) return res.status(400).json({
