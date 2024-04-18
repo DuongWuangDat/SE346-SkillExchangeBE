@@ -6,7 +6,7 @@ const bcrypt = require("../pkg/auth/authorization.js")
 const auth = require("../pkg/auth/authentication.js")
 const helper = require("../pkg/helper/helper.js")
 const Message = require("../model/message.js")
-
+const Chat = require("../model/chat.js")
 const register = async (req,res)=>{
     const isValidEmail = await helper.isValidEmail(req.body.email)
     const isValidPhoneNumber = await helper.isValidPhoneNumber(req.body.phoneNumber)
@@ -130,10 +130,9 @@ const deleteUser = async (req,res)=>{
         {
             senderID: id
         }
-    ).catch((err)=>{
-        return res.status(400).json({
-            message: "Something went wrong"
-        })
+    )
+    await Chat.deleteMany({
+        members: {$in: [id]}
     })
     await User.findByIdAndDelete(id).catch((err)=>{
         return res.status(400).json({

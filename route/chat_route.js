@@ -5,5 +5,5 @@ route.get('/find',chatController.getAllChatRoom)
 route.get('/find/:uid',chatController.getChatByUId)
 route.get('/find/both',chatController.getChatBy2UID)
 route.post('/create', chatController.createNewChat)
-route.post('/delete/:id', chatController.deleteChatRoom)
+route.delete('/delete/:id', chatController.deleteChatRoom)
 module.exports = route

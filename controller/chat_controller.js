@@ -1,5 +1,6 @@
 const chatModel = require('../model/chat.js')
 const Message = require("../model/message.js")
+const User = require("../model/user.js")
 //get all chatroom
 const getAllChatRoom = async (req,res)=>{
     const chat = await chatModel.find().catch((err)=>{console.log(err)})
@@ -70,6 +71,11 @@ const getChatBy2UID = async (req,res)=>{
 //create new chat
 const createNewChat = async (req,res)=>{
     const {firstID, secondID} = req.body
+    const user1 = await User.findById(firstID)
+    const user2 = await User.findById(secondID)
+    if(!user1 || !user2) return res.status(404).json({
+        message: "User not found"
+    })
     try{
         const existChat = await chatModel.findOne({
             members: {$all: [firstID,secondID]}

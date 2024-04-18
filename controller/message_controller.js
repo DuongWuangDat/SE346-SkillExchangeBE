@@ -1,7 +1,17 @@
 const Message = require('../model/message.js')
+const User = require("../model/user.js")
+const Chat = require("../model/chat.js")
 // post message
 const sendMessage = async(req,res)=>{
     try{
+        const user = await User.findById(req.body.senderID)
+        if(!user) return res.status(400).json({
+            message: "User not found"
+        })
+        const chat = await Chat.findById(req.body.chatID)
+        if(!chat) return res.status(400).json({
+            message: "Chat not found"
+        })
         const message = new Message(req.body)
         await message.save().then(result=>{
             return res.json({

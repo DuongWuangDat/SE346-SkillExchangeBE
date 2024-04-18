@@ -1,8 +1,13 @@
-
+const User = require("../model/user.js")
 const Request = require("../model/request.js")
 const helper = require("../pkg/helper/helper.js")
 const createNewRequest = async (req,res)=>{
     const {senderID, receiverID} = req.body
+    const user1 = await User.findById(senderID)
+    const user2 = await User.findById(receiverID)
+    if(!user1 || !user2) return res.status(400).json({
+        message: "User not found"
+    })
     const existRequest = await Request.findOne({
         senderID : senderID,
         receiverID: receiverID
