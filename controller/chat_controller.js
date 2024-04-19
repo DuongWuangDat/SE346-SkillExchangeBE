@@ -1,6 +1,7 @@
 const chatModel = require('../model/chat.js')
 const Message = require("../model/message.js")
 const User = require("../model/user.js")
+const Helper = require("../pkg/helper/helper.js")
 //get all chatroom
 const getAllChatRoom = async (req,res)=>{
     const chat = await chatModel.find().catch((err)=>{console.log(err)})
@@ -11,6 +12,12 @@ const getAllChatRoom = async (req,res)=>{
 //get chat by uid
 const getChatByUId = async (req,res)=>{
     const firstID = req.params.uid
+    const isValidId = await Helper.isValidObjectID(firstID)
+    if(!isValidId){
+        return res.status(400).json({
+            message: "Invalid id"
+        })
+    }
     const chat = await chatModel.find({
         members: {$in: [firstID]}
     }).populate('members', 'username avatar')
@@ -39,6 +46,13 @@ const getChatByUId = async (req,res)=>{
 //get chat by 2 uid
 const getChatBy2UID = async (req,res)=>{
     const {firstID,secondID} = req.body
+    const isValidFirstId = await Helper.isValidObjectID(firstID)
+    const isValidSecondId = await Helper.isValidObjectID(secondID)
+    if(!isValidFirstId || !isValidSecondId){
+        return res.status(400).json({
+            message: "Invalid id"
+        })
+    }
     try{
         const chat = await chatModel.find({
             members: {$all: [firstID,secondID]}
@@ -71,6 +85,13 @@ const getChatBy2UID = async (req,res)=>{
 //create new chat
 const createNewChat = async (req,res)=>{
     const {firstID, secondID} = req.body
+    const isValidFirstId = await Helper.isValidObjectID(firstID)
+    const isValidSecondId = await Helper.isValidObjectID(secondID)
+    if(!isValidFirstId || !isValidSecondId){
+        return res.status(400).json({
+            message: "Invalid id"
+        })
+    }
     const user1 = await User.findById(firstID)
     const user2 = await User.findById(secondID)
     if(!user1 || !user2) return res.status(404).json({
@@ -98,7 +119,13 @@ const createNewChat = async (req,res)=>{
 }
 
 const deleteChatRoom =async (req, res)=>{
-    const id= req.params.id;  
+    const id= req.params.id;
+    const isValidId = await Helper.isValidObjectID(id)
+    if(!isValidId){
+        return res.status(400).json({
+            message: "Invalid id"
+        })
+    }
     await Message.deleteMany({
         chatID: id
     }).catch((err)=>{
