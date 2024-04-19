@@ -1,6 +1,7 @@
 const Token = require("../model/token.js")
 const auth = require("../pkg/auth/authentication.js")
 const User = require("../model/user.js")
+const { isJwtExpired } = require('jwt-check-expiration');
 const addNewToken = async (token, userID)=>{
     const tokenModel= new Token({
         token: token,
@@ -15,6 +16,8 @@ const addNewToken = async (token, userID)=>{
 }
 
 const checkTokenIsRevoked = async (token) =>{
+    const isExpired = await checkTokenIsExpired(token)
+    if(isExpired) return true
     const jwt = await auth.verifyToken(token)
     const type = jwt.type
     if(type == 'access'){
@@ -54,4 +57,8 @@ const deleteTokenByUserID = async (uid) =>{
 const deleteAllToken = async ()=>{
     return await Token.deleteMany({});
 }
-module.exports = {addNewToken, checkTokenIsRevoked,revokedToken, getAccessToken,deleteTokenByUserID, deleteAllToken}
+
+const checkTokenIsExpired = async (token)=>{
+    return isJwtExpired(token)
+}
+module.exports = {addNewToken, checkTokenIsRevoked,revokedToken, getAccessToken,deleteTokenByUserID, deleteAllToken, checkTokenIsExpired}

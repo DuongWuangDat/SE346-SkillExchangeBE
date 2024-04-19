@@ -18,4 +18,23 @@ route.delete("/deleteall", async (req,res)=>{
         message: "Deleted successfully"
     })
 })
+
+route.post("/checktoken", async(req,res)=>{
+    const token = req.body.token
+    const isRevoked = await tokenController.checkTokenIsRevoked(token)
+    const isExpired  = await tokenController.checkTokenIsExpired(token)
+    if(isExpired){
+        return res.status(401).json({
+            message: "Token is expired"
+        })
+    }
+    if(isRevoked){
+        return res.status(401).json({
+            message: "Token is revoked"
+        })
+    }
+    return res.json({
+        message : "Token is valid"
+    })
+})
 module.exports= route

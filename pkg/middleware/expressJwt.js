@@ -16,7 +16,8 @@ const authJWT = ()=>{
             `${api}/upload/image`,
             {url: /\/public\/uploads(.*)/},
             `${api}/service/sendEmail`,
-            `${api}/token/deleteall`
+            `${api}/token/deleteall`,
+            `${api}/token/checktoken`
         ]
     })
 }
