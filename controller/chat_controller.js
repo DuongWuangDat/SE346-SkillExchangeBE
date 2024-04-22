@@ -37,8 +37,14 @@ const getChatByUId = async (req,res)=>{
             chatInfo: room,
             latestMessage: latestMessage
         }
+       
         dataChatList.push(dataChat)
     }))
+    dataChatList.sort((a,b)=>{
+        const dateA = a.latestMessage[0].dateTime
+        const dateB = b.latestMessage[0].dateTime
+        return dateB-dateA
+    })
     res.json({
         data: dataChatList
     })
@@ -107,6 +113,7 @@ const createNewChat = async (req,res)=>{
         const chat = new chatModel({
             members: [firstID, secondID]
         })
+        
         await chat.save().then(result=> res.json({
             message: "Create new chat successfully",
             data: result
