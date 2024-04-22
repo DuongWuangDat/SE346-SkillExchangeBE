@@ -61,47 +61,32 @@ const io = new Server(http, {
         origin: "*"
     }
 })
-const chatGroups = []
+const onlineUsers = []
 io.on("connection", (socket)=>{
     console.log(`${socket.id} connected`)
     
-    socket.on("createNewGroup", (data)=>{
-        
-        const chatModel = {
-            groupName: groupName,
-            id: chatGroups.length+1,
-            message: []
+    socket.on("addOnlineUser", (userID)=>{
+       !onlineUsers?.some((user) => user.userID == userID) &&
+        onlineUsers.push({
+            userID: userID,
+            socketID: socket.id
+        })
+        io.emit("getAllOnlineUsers", onlineUsers)
+    })
+    
+    socket.on("sendMessage", (req)=>{
+        const user = onlineUsers.find((userFind) => userFind.userID === req.recipicentID)
+        if(user){
+            io.to(user.socketID).emit("getMessage", req)
         }
-        chatGroups.unshift(chatModel)
-        socket.emit("groupList", chatGroups)
     })
 
-    socket.on("getAllChatGroups", ()=>{
-        socket.emit("groupList", chatGroups)
+    socket.on("disconnect", (userID)=>{
+        onlineUsers = onlineUsers.filter((user)=> user.userID !== userID)
+        io.emit("getAllOnlineUsers", onlineUsers)
     })
 
-    socket.on("findGroup", (id)=>{
-        const filterGroups = chatGroups.filter((item)=> item.id == id)
-        socket.emit("foundGroup", filterGroups[0].message)
-    })
-
-    socket.on("addNewMessage", (data)=>{
-        const {groupId, currentChatMessage, userId, timeData} = data
-        const filterGroups = chatGroups.filter((item)=> item.id == groupId)
-        const newMessage = {
-            id: createUniqueId(),
-            groupId: groupId,
-            currentChatMessage: currentChatMessage,
-            userId: userId,
-            timeData: `${timeData.hr}:${timeData.mins}`
-        }
-        filterGroups[0].message.push(newMessage)
-        socket.to(filterGroups[0].groupName).emit("groupMessage", newMessage)
-        socket.emit("foundGroup", filterGroups[0].message)
-        socket.emit("groupList", chatGroups)
-        
-        
-    })
+    
 })
 
 function createUniqueId() {
