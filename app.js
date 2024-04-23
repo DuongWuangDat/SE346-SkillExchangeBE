@@ -71,7 +71,7 @@ io.on("connection", (socket)=>{
             userID: userID,
             socketID: socket.id
         })
-        io.emit("getAllOnlineUsers", onlineUsers)
+        io.emit("getOnlineUsers", onlineUsers)
     })
     
     socket.on("sendMessage", (req)=>{
@@ -83,7 +83,7 @@ io.on("connection", (socket)=>{
 
     socket.on("disconnect", (userID)=>{
         onlineUsers = onlineUsers.filter((user)=> user.userID !== userID)
-        io.emit("getAllOnlineUsers", onlineUsers)
+        io.emit("getOnlineUsers", onlineUsers)
     })
 
     
