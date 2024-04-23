@@ -61,7 +61,7 @@ const io = new Server(http, {
         origin: "*"
     }
 })
-const onlineUsers = []
+let onlineUsers = []
 io.on("connection", (socket)=>{
     console.log(`${socket.id} connected`)
     
@@ -86,6 +86,7 @@ io.on("connection", (socket)=>{
         io.emit("getOnlineUsers", onlineUsers)
     })
 
+    
     
 })
 
