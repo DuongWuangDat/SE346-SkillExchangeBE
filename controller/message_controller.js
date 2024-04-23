@@ -24,7 +24,7 @@ const sendMessage = async(req,res)=>{
         await message.save().then(result=>{
             return res.json({
                 message: "Send message successfully",
-                data: message
+                data: message.populate("senderID", "username avatar")
             })
         }).catch((err)=>{
             return res.status(400).json({
