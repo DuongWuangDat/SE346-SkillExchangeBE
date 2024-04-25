@@ -21,7 +21,7 @@ const sendMessage = async(req,res)=>{
             message: "Chat not found"
         })
         const message = new Message(req.body)
-        const dataMessage = message.populate("senderID", "username avatar")
+        const dataMessage = await message.populate('senderID', 'username avatar')
         await message.save().then(result=>{
             return res.json({
                 message: "Send message successfully",
