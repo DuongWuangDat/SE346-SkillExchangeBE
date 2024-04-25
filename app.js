@@ -70,6 +70,11 @@ io.on("connection", (socket)=>{
        if(check){
         const index = onlineUsers.findIndex((user) => user.userID == userID)
         onlineUsers[index].socketID = socket.id
+       }else{
+        onlineUsers.push({
+            userID: userID,
+            socketID: socket.id
+        })
        }
         
         console.log(onlineUsers)
