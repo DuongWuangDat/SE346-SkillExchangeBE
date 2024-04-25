@@ -82,6 +82,7 @@ io.on("connection", (socket)=>{
     })
     
     socket.on("sendMessage", (req)=>{
+        console.log(req.recipicentID)
         const user = onlineUsers.find((userFind) => userFind.userID === req.recipicentID)
         console.log(user)
         if(user){
