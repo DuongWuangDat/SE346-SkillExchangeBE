@@ -71,6 +71,7 @@ io.on("connection", (socket)=>{
             userID: userID,
             socketID: socket.id
         })
+        console.log(onlineUsers)
         io.emit("getOnlineUsers", onlineUsers)
     })
     
