@@ -66,11 +66,12 @@ io.on("connection", (socket)=>{
     console.log(`${socket.id} connected`)
     
     socket.on("addOnlineUser", (userID)=>{
-       !onlineUsers?.some((user) => user.userID == userID) &&
-        onlineUsers.push({
-            userID: userID,
-            socketID: socket.id
-        })
+       const check = onlineUsers?.some((user) => user.userID == userID) 
+       if(check){
+        const index = onlineUsers.findIndex((user) => user.userID == userID)
+        onlineUsers[index].socketID = socket.id
+       }
+        
         console.log(onlineUsers)
         io.emit("getOnlineUsers", onlineUsers)
     })
