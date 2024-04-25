@@ -87,6 +87,7 @@ io.on("connection", (socket)=>{
         console.log(user)
         if(user){
             io.to(user.socketID).emit("getMessage", req)
+            io.to(user.socketID).emit("getLatestMessage", req)
         }
     })
 
