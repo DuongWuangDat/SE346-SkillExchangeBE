@@ -40,11 +40,6 @@ const getChatByUId = async (req,res)=>{
        
         dataChatList.push(dataChat)
     }))
-    dataChatList.sort((a,b)=>{
-        const dateA = a.latestMessage[0].dateTime
-        const dateB = b.latestMessage[0].dateTime
-        return dateB-dateA
-    })
     res.json({
         data: dataChatList
     })
