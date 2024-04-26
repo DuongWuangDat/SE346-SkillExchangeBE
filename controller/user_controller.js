@@ -83,7 +83,7 @@ const login = async (req,res)=>{
     })
     const user = await User.findOne({
         email: email
-    }).select('-password')
+    }).select('-password').populate("userTopicSkill").populate("learnTopicSkill")
     const accessToken = await auth.generateToken(existUser,"1h", 'access')
     const refreshToken = await auth.generateToken(existUser, "30d", 'refresh')
     tokenController.addNewToken(refreshToken, user._id)
@@ -109,7 +109,7 @@ const getUserByTopic= async (req,res)=>{
     }))
     const user = await User.find({
         userTopicSkill: {$in: topicIdList}
-    }).select('-password')
+    }).select('-password').populate("userTopicSkill").populate("learnTopicSkill")
     if(!user) return res.status(404).json({
         message: "User is not found"
     })
@@ -217,7 +217,7 @@ const getUserByEmail = async (req,res) =>{
 }
 
 const getAllUser = async (req,res)=>{
-    const userList = await User.find().select('-password').catch((err)=>{
+    const userList = await User.find().select('-password').populate("userTopicSkill").populate("learnTopicSkill").catch((err)=>{
         return res.status(400).json({
             message: "Something went wrong"
         })
@@ -233,7 +233,7 @@ const getUserById = async(req,res)=>{
     if(!isValidId) return res.status(400).json({
         message: "Invalid id"
     })
-    const existUser = await User.findById(id).select('-password')
+    const existUser = await User.findById(id).select('-password').populate("userTopicSkill").populate("learnTopicSkill")
     if(!existUser) return res.status(404).json({
         message: "User is not found"
     })
