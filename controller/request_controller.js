@@ -1,5 +1,6 @@
 const User = require("../model/user.js")
 const Request = require("../model/request.js")
+const Chat = require("../model/chat.js")
 const helper = require("../pkg/helper/helper.js")
 const createNewRequest = async (req,res)=>{
     const {senderID, receiverID} = req.body
@@ -17,8 +18,14 @@ const createNewRequest = async (req,res)=>{
         senderID : senderID,
         receiverID: receiverID
     })
-    if(existRequest) return res.status(400).json({
+    if(existRequest) return res.status(404).json({
         message: "Existed request"
+    })
+    const existChatRoom = await Chat.findOne({
+        members: {$all: [senderID,receiverID]}
+    })
+    if(existChatRoom) return res.status(404).json({
+        message: "Existed chat room"
     })
     console.log("Pass")
     const request = new Request({
