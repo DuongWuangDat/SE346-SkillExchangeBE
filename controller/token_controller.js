@@ -61,4 +61,12 @@ const deleteAllToken = async ()=>{
 const checkTokenIsExpired = async (token)=>{
     return isJwtExpired(token)
 }
-module.exports = {addNewToken, checkTokenIsRevoked,revokedToken, getAccessToken,deleteTokenByUserID, deleteAllToken, checkTokenIsExpired}
+
+const getUIDfromToken = async (req)=>{
+    const header = req.headers.authorization
+    const split = header.split(" ")
+    const token = split[1]
+    const jwt = await auth.verifyToken(token)
+    return jwt.userId
+}
+module.exports = {addNewToken, checkTokenIsRevoked,revokedToken, getAccessToken,deleteTokenByUserID, deleteAllToken, checkTokenIsExpired,getUIDfromToken}

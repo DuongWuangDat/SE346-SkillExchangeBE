@@ -18,7 +18,11 @@ const createNewRequest = async (req,res)=>{
         senderID : senderID,
         receiverID: receiverID
     })
-    if(existRequest) return res.status(404).json({
+    const existRequestRecieve = await Request.findOne({
+        senderID: receiverID,
+        receiverID: senderID
+    })
+    if(existRequest || existRequestRecieve) return res.status(404).json({
         message: "Existed request"
     })
     const existChatRoom = await Chat.findOne({

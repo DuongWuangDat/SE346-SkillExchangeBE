@@ -6,6 +6,7 @@ const bcrypt = require("../pkg/auth/authorization.js")
 const auth = require("../pkg/auth/authentication.js")
 const helper = require("../pkg/helper/helper.js")
 const Message = require("../model/message.js")
+const Request = require("../model/request.js")
 const Chat = require("../model/chat.js")
 const register = async (req,res)=>{
     const isValidEmail = await helper.isValidEmail(req.body.email)
@@ -95,11 +96,12 @@ const login = async (req,res)=>{
 }
 
 const getUserByTopic= async (req,res)=>{
+    const myId = await tokenController.getUIDfromToken(req)
     const topics = req.query.topics
     const topicList = topics.split(',')
     const topicIdList = await Promise.all(topicList.map(async (topicname)=>{
         const topic = await Topic.findOne({
-            name: { $regex: new RegExp(`^${topicname}`, 'i')}
+            name: { $regex: new RegExp(`^${topicname}`, '')}
         })
         console.log(topic);
         if(topic != null){
@@ -107,14 +109,26 @@ const getUserByTopic= async (req,res)=>{
         }
         
     }))
-    const user = await User.find({
+    
+    const chatroomUserIds = await Chat.find({
+        members: {$in: [myId]}
+    })
+    const userIds = chatroomUserIds.map(chatroom => 
+        chatroom.members.filter(memberId=> memberId.toString() !== myId.toString())
+    )
+    const requestUserIds = await Request.find({
+        senderID: myId
+    }).distinct("receiverID")
+    const users = await User.find({
+        _id: {$nin: [...userIds, ...requestUserIds, myId]},
         userTopicSkill: {$in: topicIdList}
+        
     }).select('-password').populate("userTopicSkill").populate("learnTopicSkill")
-    if(!user) return res.status(404).json({
+    if(!users) return res.status(404).json({
         message: "User is not found"
     })
     return res.json({
-        data: user
+        data: users
     })
     
 }
@@ -217,13 +231,22 @@ const getUserByEmail = async (req,res) =>{
 }
 
 const getAllUser = async (req,res)=>{
-    const userList = await User.find().select('-password').populate("userTopicSkill").populate("learnTopicSkill").catch((err)=>{
-        return res.status(400).json({
-            message: "Something went wrong"
-        })
+    const myId = await tokenController.getUIDfromToken(req)
+    const chatroomUserIds = await Chat.find({
+        members: {$in: [myId]}
     })
+    const userIds = chatroomUserIds.map(chatroom => 
+        chatroom.members.filter(memberId=> memberId.toString() !== myId.toString())
+    )
+    const requestUserIds = await Request.find({
+        senderID: myId
+    }).distinct("receiverID")
+    const users = await User.find({
+        _id: {$nin: [...userIds, ...requestUserIds, myId]}
+        
+    }).select('-password').populate("userTopicSkill").populate("learnTopicSkill")
     return res.json({
-        data: userList
+        data: users
     })
 }
 
