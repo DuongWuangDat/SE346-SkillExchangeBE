@@ -119,8 +119,11 @@ const getUserByTopic= async (req,res)=>{
     const requestUserIds = await Request.find({
         senderID: myId
     }).distinct("receiverID")
+    const requestSenderIDs = await Request.find({
+        receiverID: myId
+    }).distinct("senderID")
     const users = await User.find({
-        _id: {$nin: [...userIds, ...requestUserIds, myId]},
+        _id: {$nin: [...userIds, ...requestUserIds,...requestSenderIDs, myId]},
         userTopicSkill: {$in: topicIdList}
         
     }).select('-password').populate("userTopicSkill").populate("learnTopicSkill")
@@ -241,8 +244,11 @@ const getAllUser = async (req,res)=>{
     const requestUserIds = await Request.find({
         senderID: myId
     }).distinct("receiverID")
+    const requestSenderIDs = await Request.find({
+        receiverID: myId
+    }).distinct("senderID")
     const users = await User.find({
-        _id: {$nin: [...userIds, ...requestUserIds, myId]}
+        _id: {$nin: [...userIds, ...requestUserIds,...requestSenderIDs, myId]}
         
     }).select('-password').populate("userTopicSkill").populate("learnTopicSkill")
     return res.json({
