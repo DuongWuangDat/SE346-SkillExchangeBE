@@ -180,11 +180,16 @@ const updateUser = async (req,res)=>{
         var year = parseInt(dateSplit[2], 10);
         req.body.birthDay = new Date(Date.UTC(year,month,day))
     }
+    const isSuccess =true
     await User.findByIdAndUpdate(id,req.body).catch((err)=>{
+        isSuccess=false
+       
+    })
+    if(!isSuccess){
         return res.status(400).json({
             message: "Something went wrong"
         })
-    })
+    }
     return res.json({
         message: "Updated successfully"
     })
