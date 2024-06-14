@@ -99,7 +99,10 @@ io.on("connection", (socket)=>{
     })
 
     socket.on("acceptrequest", (req) =>{
-      
+        const user = onlineUsers.find((userFind) => userFind.userID == req.recipientID)
+        if(user){
+            io.to(user.socketID).emit("getnewchatroom", req.chatData)
+        }
     })
     socket.on("disconnect", ()=>{
         onlineUsers = onlineUsers.filter((user)=> user.socketID !== socket.id)

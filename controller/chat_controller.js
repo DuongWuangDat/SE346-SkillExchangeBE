@@ -109,7 +109,8 @@ const createNewChat = async (req,res)=>{
             members: [firstID, secondID]
         })
         
-        const chatInfo = await chat.save().populate('members', 'username avatar')
+        let chatInfo = await chat.save()
+        chatInfo = await chatInfo.populate('members', 'username avatar')
         const chatData = {
             chatInfo: chatInfo,
             latestMessage: []
