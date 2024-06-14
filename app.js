@@ -96,6 +96,7 @@ io.on("connection", (socket)=>{
         console.log("unfriend" +user)
         if(user){
             io.to(user.socketID).emit("isUnFriend", req)
+            io.to(user.socketID).emit("deleteChatRoom", req)
         }
     })
 
