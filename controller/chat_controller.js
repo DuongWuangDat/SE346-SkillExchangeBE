@@ -109,10 +109,15 @@ const createNewChat = async (req,res)=>{
             members: [firstID, secondID]
         })
         
-        await chat.save().then(result=> res.json({
+        const chatInfo = (await chat.save()).populate('members', 'username avatar')
+        const chatData = {
+            chatInfo,
+            latestMessage: []
+        }
+        return res.json({
             message: "Create new chat successfully",
-            data: result
-        }))
+            data: chatData
+        })
     }
     catch(err){
         console.log(err)
