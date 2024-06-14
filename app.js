@@ -100,6 +100,7 @@ io.on("connection", (socket)=>{
 
     socket.on("disconnect", ()=>{
         onlineUsers = onlineUsers.filter((user)=> user.socketID !== socket.id)
+        console.log(onlineUsers)
         io.emit("getOnlineUsers", onlineUsers)
     })
 
