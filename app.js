@@ -93,6 +93,7 @@ io.on("connection", (socket)=>{
 
     socket.on("unfriend", (req) =>{
         const user = onlineUsers.find((userFind) => userFind.userID == req.recipientID)
+        console.log("unfriend" +user)
         if(user){
             io.to(user.socketID).emit("isUnFriend", req)
         }
