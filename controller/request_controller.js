@@ -107,4 +107,17 @@ const deleteRequest = async(req,res)=>{
     })
 }
 
-module.exports = {deleteRequest,createNewRequest,getRequestBySenderId, getRequestByRecieverId}
+const deleteRequestBySenderId = async (req,res)=>{
+    const senderId = req.body.senderId
+    const isValidId = await helper.isValidObjectID(senderId)
+    if(!isValidId) return res.status(400).json({
+        message: "Invalid id"
+    })
+    await Request.deleteMany({
+        senderID: senderId
+    })
+    return res.json({
+        message: "Deleted request successfully"
+    })
+}
+module.exports = {deleteRequest,createNewRequest,getRequestBySenderId, getRequestByRecieverId,deleteRequestBySenderId}
