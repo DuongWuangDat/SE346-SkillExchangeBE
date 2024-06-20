@@ -101,7 +101,7 @@ const getUserByTopic= async (req,res)=>{
     const topicList = topics.split(',')
     const topicIdList = await Promise.all(topicList.map(async (topicname)=>{
         const topic = await Topic.findOne({
-            name: { $regex: new RegExp(`^${topicname}`, '')}
+            name: topicname
         })
         console.log(topic);
         if(topic != null){
