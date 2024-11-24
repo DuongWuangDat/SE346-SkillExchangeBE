@@ -11,7 +11,7 @@ const createNewRequest = async (req,res)=>{
     })
     const user1 = await User.findById(senderID)
     const user2 = await User.findById(receiverID)
-    if(!user1 || !user2) return res.status(400).json({
+    if(!user1 || !user2) return res.status(404).json({
         message: "User not found"
     })
     const existRequest = await Request.findOne({
@@ -22,13 +22,13 @@ const createNewRequest = async (req,res)=>{
         senderID: receiverID,
         receiverID: senderID
     })
-    if(existRequest || existRequestRecieve) return res.status(404).json({
+    if(existRequest || existRequestRecieve) return res.status(400).json({
         message: "Existed request"
     })
     const existChatRoom = await Chat.findOne({
         members: {$all: [senderID,receiverID]}
     })
-    if(existChatRoom) return res.status(404).json({
+    if(existChatRoom) return res.status(400).json({
         message: "Existed chat room"
     })
     console.log("Pass")

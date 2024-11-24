@@ -13,11 +13,11 @@ const sendMessage = async(req,res)=>{
             message: "Invalid id"
         })
         const user = await User.findById(req.body.senderID)
-        if(!user) return res.status(400).json({
+        if(!user) return res.status(404).json({
             message: "User not found"
         })
         const chat = await Chat.findById(req.body.chatID)
-        if(!chat) return res.status(400).json({
+        if(!chat) return res.status(404).json({
             message: "Chat not found"
         })
         const message = new Message(req.body)
